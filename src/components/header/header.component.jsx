@@ -4,8 +4,10 @@ import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { ReactComponent as Logo } from '../../assets/original.svg';
 import { auth } from '../../firebase/firebase.utils';
+import CartIcon from '../cart-icon/cart-icon.component';
+import CartDropdown from '../cart-dropdown/cart-dropdown.component';
 
-const Header = ({ currentUser }) => {
+const Header = ({ currentUser, hidden }) => {
     console.log(currentUser);
     return (
         <div className='header'>
@@ -24,13 +26,20 @@ const Header = ({ currentUser }) => {
                     ? (<Link className='option' to='/' onClick={() => auth.signOut()}>SIGN OUT</Link>)
                     : (<Link className='option' to='/signin'>SIGN IN</Link>)
                 }
+                <CartIcon />
             </div>
+            {
+                hidden 
+                ? null
+                : (<CartDropdown />)
+            }
         </div>
     )
 };
 // state is for rootReducer
-const mapStateToProps = state => ({ // this is how components get the state from reducer and they listen to reducer and their state change triggers the re-render
-    currentUser: state.user.currentUser // get the current user we need from root reducer which calls user reducer because state(rootReducer).user(userReducer) currentUser
+const mapStateToProps = ({ user: { currentUser}, cart: { hidden } }) => ({ // this is how components get the state from reducer and they listen to reducer and their state change triggers the re-render
+    currentUser, // get the current user we need from root reducer which calls user reducer because state(rootReducer).user(userReducer) currentUser
+    hidden
 })
 
 export default connect(mapStateToProps)(Header); // Connect component to the reducer
