@@ -1,6 +1,7 @@
 import React from 'react';
 import './header.styles.scss';
 import { Link } from 'react-router-dom';
+import { connect } from 'react-redux';
 import { ReactComponent as Logo } from '../../assets/original.svg';
 import { auth } from '../../firebase/firebase.utils';
 
@@ -26,6 +27,12 @@ const Header = ({ currentUser }) => {
             </div>
         </div>
     )
-}
+};
+// state is for rootReducer
+const mapStateToProps = state => ({ // this is how components get the state from reducer and they listen to reducer and their state change triggers the re-render
+    currentUser: state.user.currentUser // get the current user we need from root reducer which calls user reducer because state(rootReducer).user(userReducer) currentUser
+})
 
-export default Header;
+export default connect(mapStateToProps)(Header); // Connect component to the reducer
+// when connecting component to redux reducer two things are needed, in the first () goes the function that gets the state from reducer 
+// in second () goes our component

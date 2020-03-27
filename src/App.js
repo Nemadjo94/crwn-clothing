@@ -6,34 +6,28 @@ import { Route, Switch } from 'react-router-dom';
 import Header from './components/header/header.component';
 import SignInAndSignUp from './pages/sign-in-and-sign-up/sign-in-and-sign-up.component';
 import { auth, createUserProfileDocument } from './firebase/firebase.utils';
+import { connect } from 'react-redux';
+import { setCurrentUser } from './redux/user/user.actions';
 
 
 class App extends React.Component {
-  constructor(){ 
-    super();
-
-    this.state = {
-      currentUser: null
-    }
-  }
-
   unsubsribeFromAuth = null;
 
-  componentDidMount() { // 
+  componentDidMount() { 
+    const {setCurrentUser} = this.props;
+
     this.unsubsribeFromAuth = auth.onAuthStateChanged(async userAuth => {
       if (userAuth) {
         const userRef = await createUserProfileDocument(userAuth);
 
         userRef.onSnapshot(snapshot => {
-          this.setState({
-            currentUser: {
+          setCurrentUser({ // call setCurrentUser action and pass our object as payload
               id: snapshot.id,
               ...snapshot.data()
-            }
-          });
+            });
         });
       } else {
-        this.setState({ currentUser: userAuth });
+        setCurrentUser(userAuth);
       }
     });
   }
@@ -45,7 +39,7 @@ class App extends React.Component {
   render(){
     return (
       <div>
-        <Header currentUser={this.state.currentUser} />
+        <Header />
         <Switch>
           <Route exact path='/' component={HomePage} />
           <Route path='/shop' component={ShopPage} />
@@ -58,4 +52,8 @@ class App extends React.Component {
   
 }
 
-export default App;
+const mapDispatchToProps = dispatch => ({ // dispatch triggers the action to reducer
+  setCurrentUser: user => dispatch(setCurrentUser(user)) // dispatch is a way redux dispatches an action to every reducer
+});
+
+export default connect(null, mapDispatchToProps)(App); // null as first argument because we dont need any state from reducer (we dont need mapStateToProps function)
