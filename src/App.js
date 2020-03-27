@@ -2,12 +2,12 @@ import React from 'react';
 import './App.css';
 import HomePage from './pages/homepage/homepage.component';
 import ShopPage from './pages/shop/shop.component';
-import { Route, Switch } from 'react-router-dom';
+import { Route, Switch, Redirect } from 'react-router-dom';
 import Header from './components/header/header.component';
-import SignInAndSignUp from './pages/sign-in-and-sign-up/sign-in-and-sign-up.component';
 import { auth, createUserProfileDocument } from './firebase/firebase.utils';
 import { connect } from 'react-redux';
 import { setCurrentUser } from './redux/user/user.actions';
+import SignInAndSignUpPage from './pages/sign-in-and-sign-up/sign-in-and-sign-up.component';
 
 
 class App extends React.Component {
@@ -43,7 +43,7 @@ class App extends React.Component {
         <Switch>
           <Route exact path='/' component={HomePage} />
           <Route path='/shop' component={ShopPage} />
-          <Route path='/signin' component={SignInAndSignUp} />
+          <Route exact path='/signin' render={() => this.props.currentUser ? (<Redirect to='/'/>) : (<SignInAndSignUpPage />)} />
         </Switch>
       </div>
     );
@@ -52,8 +52,12 @@ class App extends React.Component {
   
 }
 
+const mapStateToProps = ({ user }) => ({
+  currentUser: user.currentUser
+});
+
 const mapDispatchToProps = dispatch => ({ // dispatch triggers the action to reducer
   setCurrentUser: user => dispatch(setCurrentUser(user)) // dispatch is a way redux dispatches an action to every reducer
 });
 
-export default connect(null, mapDispatchToProps)(App); // null as first argument because we dont need any state from reducer (we dont need mapStateToProps function)
+export default connect(mapStateToProps, mapDispatchToProps)(App); // null as first argument because we dont need any state from reducer (we dont need mapStateToProps function)
