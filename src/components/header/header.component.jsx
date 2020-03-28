@@ -2,10 +2,13 @@ import React from 'react';
 import './header.styles.scss';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
+import { createStructuredSelector } from 'reselect';
 import { ReactComponent as Logo } from '../../assets/original.svg';
 import { auth } from '../../firebase/firebase.utils';
 import CartIcon from '../cart-icon/cart-icon.component';
 import CartDropdown from '../cart-dropdown/cart-dropdown.component';
+import { selectCartHidden } from '../../redux/cart/cart.selectors';
+import { selectCurrentUser } from '../../redux/user/user.selectors';
 
 const Header = ({ currentUser, hidden }) => {
     console.log(currentUser);
@@ -36,12 +39,10 @@ const Header = ({ currentUser, hidden }) => {
         </div>
     )
 };
-// state is for rootReducer
-const mapStateToProps = ({ user: { currentUser}, cart: { hidden } }) => ({ // this is how components get the state from reducer and they listen to reducer and their state change triggers the re-render
-    currentUser, // get the current user we need from root reducer which calls user reducer because state(rootReducer).user(userReducer) currentUser
-    hidden
-})
 
-export default connect(mapStateToProps)(Header); // Connect component to the reducer
-// when connecting component to redux reducer two things are needed, in the first () goes the function that gets the state from reducer 
-// in second () goes our component
+const mapStateToProps = createStructuredSelector({ // structured selector automatski prosledjuje state da ne bi smo pisali za svaki props
+    currentUser: selectCurrentUser,
+    hidden: selectCartHidden
+});
+
+export default connect(mapStateToProps)(Header); 
